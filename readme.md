@@ -9,6 +9,10 @@ but mostly they're a convenient way to pack three dimensional
 data into a format browsers understand for
 applications [like this](http://maxogden.github.com/voxel-city/?url=simple_sf.png).
 
+### install
+
+`pip install numpy PIL`, run as `./hgt2png` or add to `PATH`
+
 ### FORMAT:
 
 Red channel: `floor ( height / 256 )` (measurement in meters)
