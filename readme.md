@@ -43,7 +43,7 @@ is that it's not obvious how to assign arbitrary points to SRTM
 "Regions", so you have to script it yourself if you want to do 
 something huge, otherwise just
 go here: 
-[http://maxogden.github.com/voxel-city/?url=simple_sf.png](http://maxogden.github.com/voxel-city/?url=simple_sf.png)
+[http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/](http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
 and pass the relevant url to the flag as in the examples.
 
 ### You could also
