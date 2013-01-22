@@ -49,10 +49,6 @@ parser.add_argument('-im', '--image-format', default='png',
 
 args = parser.parse_args()
 
-print args.bbox
-
-print args
-
 def download (url):
     fname = url.split('/')[-1]
     req = urllib2.urlopen(url)
@@ -101,12 +97,8 @@ def process (fname):
     maxx = int(math.ceil( x1 * args.width ))
     maxy = int(math.ceil( y1 * args.width ))
 
-    print minx, miny, maxx, maxy
-
     irange = int(maxx - minx)
     jrange = int(maxy - miny)
-
-    print irange, jrange
 
     square_width = min(irange, jrange)
 

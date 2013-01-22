@@ -5,32 +5,42 @@
 <body>
 <script>
 
-function setup (heightmap) {
-  im = new Image;
-  im.src = heightmap;
-  im.onload = setCanvas;
-  document.body.appendChild(im);
-}
+var queue = ["part-360-2160-1081-3241-N36W117.png",
+"part-1730-684-2215-1033--square-N37W123.png",
+"part-1730-684-2215-1033-N37W123.png",
+"part-2160-1080-3061-2161-N36W119.png"]
 
-function setCanvas() {
-  c = document.createElement("canvas")
-  c.height = im.height;
-  c.width = im.width;
-  context = c.getContext("2d")
-  check();
-}
+function reporter (url) {
+  var im, c, context, width, height;
+  console.log(arguments)
 
-function checker (url) {
-  var max = 0;
-  var x = 0, y = 0, el = 0;
+  function imagize (heightmap) {
+    im = new Image;
+    im.src = heightmap;
+    im.onload = function () { canvasize(heightmap) };
+    document.body.appendChild(im);
+  }
+
+  function canvasize(heightmap) {
+    c = document.createElement("canvas")
+    c.height = im.height;
+    c.width = im.width;
+    context = c.getContext("2d")
+    check();
+  }
+
+  var max = -12000, min = 10000,
+      xmin = 0, ymin = 0,
+      xmax = 0, ymax = 0,
+      el = 0;
 
   function check () {
     var r, g, b, a, idx;
     context.drawImage(im,0,0);
     width = context.canvas.width;
     height = context.canvas.height;
-    data0 = context.getImageData(0,0,width,height);
-    data = data0.data;
+    var data0 = context.getImageData(0,0,width,height);
+    var data = data0.data;
     for (var j = 0; j < height; j++) {
       for (var i = 0; i < width; i++) {
         idx = j * height * 4 + i * 4;
@@ -38,11 +48,17 @@ function checker (url) {
         g = data[idx+1];
         b = data[idx+2];
         a = data[idx+3];
-        el = r * 256 + g;
+        el = ( r * 256 + g );
+        if (a == 21) el = el*(-1);
         if (el > max) {
           max = el;
-          x = i;
-          y = j;
+          xmax = i;
+          ymax = j;
+        }
+        if (el <= min) {
+          min = (a == 21)? -el: el;
+          xmin = i;
+          ymin = j;
         }
       }
     }
@@ -52,12 +68,15 @@ function checker (url) {
   function reportResult () {
     var result = document.createElement("p")
     result.innerHTML = "max elevation: " + max + " m" +
-    '<br> at pt ' + x + ' ' + y;
+    '<br> at pt ' + xmax + ' ' + ymax + '<br> ' +
+    "min elevation (including misreported voids @0): " + min + " m" +
+    '<br> at pt ' + xmin + ' ' + ymin;
     document.body.appendChild(result);
+    if (queue.length) reporter()(queue.pop())
   }
-  return check;
+  return imagize;
 }
 
-
+reporter()(queue.pop())
 
   </script>

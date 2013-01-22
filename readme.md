@@ -42,6 +42,11 @@ go here:
 [http://maxogden.github.com/voxel-city/?url=simple_sf.png](http://maxogden.github.com/voxel-city/?url=simple_sf.png)
 and pass the relevant url to the flag as in the examples.
 
+### You could also
+
+maybe specify `--image-format tif` and then georeference the tif and
+upload to mapbox.
+
 ### Examples
 
 Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96:
