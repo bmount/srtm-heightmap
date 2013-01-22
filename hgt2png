@@ -1,0 +1,176 @@
+#!/usr/bin/env python
+
+import numpy
+from PIL import Image
+import math
+import sys
+import argparse
+import os
+import urllib2
+
+help_msg = """
+provide some combination of file and url to process, examples:
+
+Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96:
+
+hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_03/N38W097.hgt.zip
+
+Use, resize or reuse a file you already downloaded:
+
+hgt2png --file N38W097.hgt
+
+Render a smaller area of that tile:
+
+hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5
+
+Render a square area of that tile:
+
+hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5
+
+Render an interesting part of Death Valley starting from nothing:
+
+hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W117.hgt.zip --bbox -117.452087 36.642529 -117.053146 36.848307
+
+"""
+
+test_url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W119.hgt.zip"
+
+dl_message = """
+See the region definition jpeg here: http://dds.cr.usgs.gov/srtm/version2_1/
+"""
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', '--file', 
+        help='path to local file')
+parser.add_argument('-u', '--url', default=test_url, 
+        help='url to download (necessary, cannot be inferred from geography)')
+parser.add_argument('-b', '--bbox', nargs=4, type=float, 
+        help='two coordinate pairs, min lon, min lat, max lon, max lat')
+parser.add_argument('-s', '--square', action='store_true', 
+        help='to generate a square png based on the bbox')
+parser.add_argument('-w', '--width', default=3601, 
+        help='maybe use if other than srtm 1')
+parser.add_argument('-im', '--image-format', default='png', 
+        help='should also work with tif ie for upload to mapbox')
+
+args = parser.parse_args()
+
+print args.bbox
+
+print args
+
+def download (url):
+    fname = url.split('/')[-1]
+    req = urllib2.urlopen(url)
+    CHUNK = 16 * 1024
+    if fname in os.listdir('.'):
+        return fname.replace('.zip', '')
+    with open(fname, 'wb') as fp:
+        while True:
+            chunk = req.read(CHUNK)
+            if not chunk: break
+            fp.write(chunk)
+    os.system("unzip " + fname)
+    return fname.replace('.zip', '')
+
+def dehumanize_filename (n):
+    n = n.replace("W", ' -')
+    n = n.replace("N", ' ')
+    n = n.replace("S", ' -')
+    n = n.replace("E", ' ')
+    n = n.replace(".hgt", '')
+    return [float(k) for k in n.split()][::-1]
+
+
+def process (fname):
+    bbox = args.bbox
+    p = dehumanize_filename(fname)
+    #low left, up right
+    if bbox:
+        ll = args.bbox[0:2]
+        ur = args.bbox[2:]
+    else:
+        ll = p
+        ur = [ ll[0] + 1, ll[1] + 1 ]
+
+    x0 = ll[0] - p[0]
+    x1 = ur[0] - p[0]
+
+    y0 = p[1] + 1 - ur[1]
+    y1 = p[1] + 1 - ll[1]
+
+    print x0, y0, x1, y1
+
+    minx = int(math.floor( x0 * args.width ))
+    miny = int(math.floor( y0 * args.width ))
+
+    maxx = int(math.ceil( x1 * args.width ))
+    maxy = int(math.ceil( y1 * args.width ))
+
+    print minx, miny, maxx, maxy
+
+    irange = int(maxx - minx)
+    jrange = int(maxy - miny)
+
+    print irange, jrange
+
+    square_width = min(irange, jrange)
+
+    if args.square:
+        irange = square_width
+        jrange = square_width
+
+    # >i2 bigendian 2 byte signed int
+    image = numpy.fromfile(fname, dtype='>i2').reshape(args.width, args.width)
+    # for memory constrained situation:
+    # image = numpy.memmap(_f, dtype='>i2', mode="r+", shape=(3601,3601))
+
+    def trans (x, y, i, j, arr_in, arr_out, neg=True):
+        h = arr_in[y][x]
+        if h < 0:
+            if neg:
+                a = 21
+                h = abs(h)
+            else:
+                h = 0
+                a = 255
+        else:
+            a = 255
+        cm = int(round( (abs(h) - math.floor(abs(h))) * 100 ))
+        arr_out[i, j] = ( h / 256, h % 256, cm, a) # or (h/256, h%256, cm, 255)
+            
+
+    i, j = 0, 0
+
+    img = Image.new('RGB', (int(irange), int(jrange)), (0,0,0,255))
+    im = img.load()
+
+    x = minx
+    y = miny
+
+    while j < jrange:
+        while i < irange:
+            trans(x, y, i, j, image, im)
+            i += 1
+            x += 1
+        i = 0
+        j += 1
+        x = minx
+        y += 1
+
+    fname_pre = ''
+    if args.bbox:
+        fname_pre = 'part-'+'-'.join([str(s) for s in [minx, miny, maxx, maxy]]) + '-'
+        if args.square:
+            fname_pre += '-square-'
+    img.save(fname_pre + fname.replace('hgt', args.image_format))
+
+
+if args.url:
+    fname = download(args.url)
+    process(fname)
+elif args.file:
+    fname = args.file
+    process(fname)
+else:
+    print help_msg
