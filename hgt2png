@@ -33,16 +33,10 @@ hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W117.hgt
 
 """
 
-test_url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W119.hgt.zip"
-
-dl_message = """
-See the region definition jpeg here: http://dds.cr.usgs.gov/srtm/version2_1/
-"""
-
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--file', 
         help='path to local file')
-parser.add_argument('-u', '--url', default=test_url, 
+parser.add_argument('-u', '--url', default=False, 
         help='url to download (necessary, cannot be inferred from geography)')
 parser.add_argument('-b', '--bbox', nargs=4, type=float, 
         help='two coordinate pairs, min lon, min lat, max lon, max lat')
