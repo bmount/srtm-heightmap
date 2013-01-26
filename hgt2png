@@ -128,7 +128,7 @@ def process (fname):
 
     i, j = 0, 0
 
-    img = Image.new('RGB', (int(irange), int(jrange)), (0,0,0,255))
+    img = Image.new('RGBA', (int(irange), int(jrange)), (0,0,0,255))
     im = img.load()
 
     x = minx
