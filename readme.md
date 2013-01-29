@@ -53,6 +53,10 @@ Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96:
 
     hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_03/N38W097.hgt.zip
 
+Same, outputting a georeferenced tiff, ie for loading into TileMill (requires gdal):
+
+    hgt2png --exportable --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_03/N38W097.hgt.zip
+
 Use, resize or reuse a file you already downloaded:
 
     hgt2png --file N38W097.hgt

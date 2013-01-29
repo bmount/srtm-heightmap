@@ -33,6 +33,7 @@ hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W117.hgt
 
 """
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-f', '--file', 
         help='path to local file')
@@ -45,7 +46,9 @@ parser.add_argument('-s', '--square', action='store_true',
 parser.add_argument('-w', '--width', default=3601, 
         help='maybe use if other than srtm 1')
 parser.add_argument('-im', '--image-format', default='png', 
-        help='should also work with tif ie for upload to mapbox')
+        help='ie raw jpeg')
+parser.add_argument('-ex', '--exportable', action='store_true', 
+        help='georeferenced tif ie for TileMill')
 
 args = parser.parse_args()
 
@@ -149,7 +152,19 @@ def process (fname):
         fname_pre = 'part-'+'-'.join([str(s) for s in [minx, miny, maxx, maxy]]) + '-'
         if args.square:
             fname_pre += '-square-'
-    img.save(fname_pre + fname.replace('hgt', args.image_format))
+    img_fname = fname_pre + fname.replace('hgt', args.image_format)
+    img.save(img_fname)
+    if args.exportable:
+        os.system("gdal_translate -a_nodata 0 -of GTiff \
+            -a_srs EPSG:4326 -a_ullr \
+            %(x0)f %(y1)f %(x1)f %(y0)f \
+            %(img_fname)s \
+            %(tiff_out)stiff" % { "img_fname": img_fname,
+                  "tiff_out": img_fname.replace(args.image_format, ''),
+                  "x0":ll[0],
+                  "y0":ll[1],
+                  "x1":ur[0],
+                  "y1":ur[1] })
 
 
 if args.url:
