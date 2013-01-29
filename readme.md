@@ -46,10 +46,10 @@ go here:
 [http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/](http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
 and pass the relevant url to the flag as in the examples.
 
-### You could also
+### If you have GDAL installed
 
-maybe specify `--image-format tif` and then georeference the tif and
-upload to mapbox.
+you can call it with `--exportable` and you'll get a georeferenced tif
+that you can use for example in TileMill or QGIS.
 
 ### Examples
 
