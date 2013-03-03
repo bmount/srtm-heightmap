@@ -2,7 +2,6 @@ function regions (pt) {
   var pt = pt;
   if (!Array.isArray(pt) || pt.length < 2) return false;
   var r = [ 
-    [[180,90], [180,90]], // avoid falsy index
     [[-126, 38], [-111.00001, 50]], // region 1
     [[-111, 38], [-97.00001, 50]], // 2
     [[-97, 38], [-83.00001, 50]], // 3
@@ -15,7 +14,7 @@ function regions (pt) {
   function within (a,i) {
     if (pt[0] >= r[i][0][0] && pt[0] <= r[i][1][0]) {
       if (pt[1] >= r[i][0][1] && pt[1] <= r[i][1][1]) {     
-        return i;
+        return i + 1;
       }
       return false;
     }
