@@ -192,12 +192,16 @@ def url_for (pt):
   r = region_for(pt)
   if not r: 
       return False
-  base_url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_0"
-  hgt = 'N' + str(int(math.floor(pt[1]))) + 'W' + str(int(math.ceil(abs(pt[0])))) + '.hgt.zip'
-  return base_url + str(r) + '/' + hgt
+  base_url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_0{0}/N{1}W{2}.hgt.zip"
+  lon = str(int(math.ceil(abs(pt[0]))))
+  if len(lon) < 3:
+    lon = '0'+lon
+  lat = str(int(math.floor(pt[1])))
+  return base_url.format(str(r), lat, lon)
 
 if args.bbox and not args.file:
-    fname = download(url_for(args.bbox[::2] ))
+    print url_for(args.bbox[0:2])
+    fname = download(url_for(args.bbox[0:2] ))
     process(fname)
 elif args.download:
     fname = download(url_for(args.download))
