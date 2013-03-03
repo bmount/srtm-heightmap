@@ -9,27 +9,23 @@ import os
 import urllib2
 
 help_msg = """
-provide some combination of file and url to process, examples:
 
-Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96:
+Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96,
+in 1 big tile containing the point [x,y] provided:
 
-hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_03/N38W097.hgt.zip
+`hgt2png --download 96.432 38.123`
+
+Download and create a PNG of the data within a bounding box:
+
+`hgt2png --bbox -96.8 38.2 -96.6 38.5`
 
 Use, resize or reuse a file you already downloaded:
 
-hgt2png --file N38W097.hgt
+`hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
 
-Render a smaller area of that tile:
+Render a square area only:
 
-hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5
-
-Render a square area of that tile:
-
-hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5
-
-Render an interesting part of Death Valley starting from nothing:
-
-hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W117.hgt.zip --bbox -117.452087 36.642529 -117.053146 36.848307
+`hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
 
 """
 
@@ -170,7 +166,7 @@ def process (fname):
                   "y1":ur[1] })
 
 def region_for (pt):
-  r = [ 
+  regions = r = [ 
     [[-126, 38], [-111.00001, 50]], # region 1
     [[-111, 38], [-97.00001, 50]], # 2
     [[-97, 38], [-83.00001, 50]], # 3
@@ -180,33 +176,33 @@ def region_for (pt):
     [[-180, 0], [-129, 60]] # 7
   ]
 
-  def within (a):
+  def within (i):
     if (pt[0] >= r[i][0][0] and pt[0] <= r[i][1][0]):
       if (pt[1] >= r[i][0][1] and pt[1] <= r[i][1][1]):
-        return i + 1
+        return i+1
       return False
     return False
 
-  rv = filter(bool, map(within, r))
-  if len(rv) > 0:
-    return rv
+  for i, b in enumerate(regions):
+    hit = within (i)
+    if hit: return hit
   return False
-
 
 def url_for (pt):
   r = region_for(pt)
   if not r: 
       return False
   base_url = "http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_0"
-  hgt = 'N' + str(math.floor(pt[1])) + 'W' + str(int(math.ceil(abs(pt[0])))) + '.hgt'
-  return baseUrl + r + '/' + hgt
+  hgt = 'N' + str(int(math.floor(pt[1]))) + 'W' + str(int(math.ceil(abs(pt[0])))) + '.hgt.zip'
+  return base_url + str(r) + '/' + hgt
 
-if args.download:
-    #fname = download(url_for(args.download))
-    print url_for(args.download)
-    print fname
-    #process(fname)
-if args.url:
+if args.bbox and not args.file:
+    fname = download(url_for(args.bbox[::2] ))
+    process(fname)
+elif args.download:
+    fname = download(url_for(args.download))
+    process(fname)
+elif args.url:
     fname = download(args.url)
     process(fname)
 elif args.file:

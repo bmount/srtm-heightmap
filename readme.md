@@ -1,5 +1,7 @@
 ## Terrain data for web maps, games, visualizations
 
+![death valley example](http://i.imgur.com/QvCguk8.png)
+
 This is a little utility for generating heightmaps from
 [Shuttle Radar Topography Mission](http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/) 
 records.
@@ -53,29 +55,21 @@ that you can use for example in TileMill or QGIS.
 
 ### Examples
 
-Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96:
+Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96,
+in 1 big tile containing the point [lon,lat] provided:
 
-    hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_03/N38W097.hgt.zip
+`hgt2png --download 96.432 38.123`
 
-Same, outputting a georeferenced tiff, ie for loading into TileMill (requires gdal):
+Download and create a PNG of the data within a bounding box:
 
-    hgt2png --exportable --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_03/N38W097.hgt.zip
+`hgt2png --bbox -96.8 38.2 -96.6 38.5`
 
 Use, resize or reuse a file you already downloaded:
 
-    hgt2png --file N38W097.hgt
+`hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
 
-Render a smaller area of that hgt record:
+Render a square area only:
 
-    hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5
-        
-Render a square area of that tile:
-        
-    hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5
-
-Render an interesting part of Death Valley starting from nothing:
-
-    hgt2png --url http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/Region_04/N36W117.hgt.zip --bbox -117.452087 36.642529 -117.053146 36.848307
-
+`hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
 
 ### License: MIT
