@@ -15,6 +15,25 @@ applications [like this](http://maxogden.github.com/voxel-city/?url=simple_sf.pn
 
 `pip install numpy PIL`, run as `./hgt2png` or add to `PATH`
 
+### Examples
+
+Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96,
+in 1 big tile containing the point [lon,lat] provided:
+
+`hgt2png --download 96.432 38.123`
+
+Download and create a PNG of the data within a bounding box:
+
+`hgt2png --bbox -96.8 38.2 -96.6 38.5`
+
+Use, resize or reuse a file you already downloaded:
+
+`hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
+
+Render a square area only:
+
+`hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
+
 ### FORMAT:
 
 Red channel: `floor ( height / 256 )` (measurement in meters)
@@ -34,42 +53,9 @@ Elevation equals
 Unprojected lon lat coordinates can be calculated
 from the images + file names.
 
-### The good news
-
-is that this simple format is sufficient to encode every point on
-earth to a precision of 1 cm, including the ocean floors!
-
-### The bad news
-
-is that it's not obvious how to assign arbitrary points to SRTM 
-"Regions", so you have to script it yourself if you want to do 
-something huge, otherwise just
-go here: 
-[http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/](http://dds.cr.usgs.gov/srtm/version2_1/SRTM1/)
-and pass the relevant url to the flag as in the examples.
-
 ### If you have GDAL installed
 
 you can call it with `--exportable` and you'll get a georeferenced tif
 that you can use for example in TileMill or QGIS.
-
-### Examples
-
-Download and create PNG of the SRTM data for N 38 W 97 to N 39 W 96,
-in 1 big tile containing the point [lon,lat] provided:
-
-`hgt2png --download 96.432 38.123`
-
-Download and create a PNG of the data within a bounding box:
-
-`hgt2png --bbox -96.8 38.2 -96.6 38.5`
-
-Use, resize or reuse a file you already downloaded:
-
-`hgt2png --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
-
-Render a square area only:
-
-`hgt2png --square --file N38W097.hgt --bbox -96.8 38.2 -96.6 38.5`
 
 ### License: MIT
