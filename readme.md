@@ -11,6 +11,8 @@ but mostly they're a convenient way to pack three dimensional
 data into a format browsers understand for
 applications [like this](http://maxogden.github.com/voxel-city/?url=simple_sf.png).
 
+#### 1px = 1/3600 degree longitude or latitude, about 30m, color value is height, encoded as described below
+
 ### install
 
 `pip install numpy PIL`, run as `./hgt2png` or add to `PATH`
